@@ -1,0 +1,17 @@
+{
+  "name": "hoiio-call-example",
+  "scripts": {
+    "start": "app.js"
+  },
+  "version": "0.0.1",
+  "engines": {
+    "node": "0.6.x - 0.8.x"
+  },
+  "dependencies": {
+    "express": "3.0.0beta4",
+    "jade": "*",
+    "stylus": "*",
+    "lodash": "0.3.x",
+    "superagent": "0.5.x"
+  }
+}

@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1= title
+
+  form(action="/call", method="post")
+    fieldset
+      .field
+        label Number you want to call to
+        input(type='tel', name="to", placeholder='e.g. +6598537745')
+        span Have to add country code a!
+
+      .actions
+        input(type="submit", value="Call now!")
