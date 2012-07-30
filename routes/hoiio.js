@@ -1,192 +1,169 @@
 
-// Dependencies
-var request = require('superagent');
-var _ = require('lodash');
-var url = require('url')
+    // Dependencies
+var request = require( 'superagent' ),
+    url = require( 'url' ),
+    _ = require( 'lodash' )
 
 
-var app = require('../app');
-
-
-// Destination number
-var dest_number = 'DESTONATION_NUMBER';
-
-// Hoiio Number
-var HOIIO_NUMBER = '+6566028213';
-
-
-var settings = {
-
-  // App ID of HOIIO
-  app_id: process.env.hoiio_app_id
-
-  // Access Token
-, access_token: process.env.hoiio_access_token
-
-};
+var app = require( '../app' ),
+    env = process.env
+    opts = {}
 
 
 // IVR URL
-var ivrUrl = 'https://secure.hoiio.com/open/ivr';
+var ivrUrl = 'https://secure.hoiio.com/open/ivr'
 
 
-exports.call = function call (req, res, next) {
+opts.app_id = env.HOIIO_APP_ID
 
-  console.log('On Call >>>>>>>>>>>>>>>>>>>>>>');
-  console.log(req.body);
+opts.access_token = env.HOIIO_ACCESS_TOKEN
 
-  transfer(req);
+
+
+exports.call = function (req, res, next) {
+
+  transfer( req )
 
   // Response with OK to prevent another from waiting
-  res.send('OK');
-  console.log('On Call >>>>>>>>>>>>>>>>>>>>>>');
+  res.send( 'OK' )
 
+  return
 }
 
-exports.hangup = function hangup (req, res, next) {
+exports.hangup = function (req, res, next) {
 
-  console.log('Call Hangup', req.body.session)
-  console.log(req.body);
+  console.log( 'Call Hangup >> ', req.body.session )
 
-  res.send('OK');
+  res.send( 'OK' )
 
 }
 
 
 exports.makecall = function (req, res, next) {
 
-  res.render('call', { title: 'Make call' });
+  res.render( 'call', {
+    title: 'Make call'
+  })
 
 }
 
 exports.handleMakeCall = function (req, res, next) {
 
   // Cancel the actiona and redirect back to call page
-  if (!req.body.to) { res.redirect('/call'); }
+  if ( ! req.body.to ) {
+    res.redirect( '/call' )
+  }
 
-  makecall(req, res);
+  makecall( req, res )
 
 }
 
 
 exports.hangup = function (req, res, next) {
 
-  console.log(req.body);
+  console.log( req.body )
 
-  res.send('OK')
+  res.send( 'OK' )
 
 }
 
 
-function makecall(req, res) {
-
-  var root = getUrl(req);
+function makecall (req, res) {
 
   // Setting up data to be send out to Hoiio
-  var data = _.extend(_.clone(settings), {
+  var data = _.extend( _.clone( opts ), {
 
-    notify_url: root + '/on/hangup'
+    caller_id: env.HOIIO_NUMBER,
+    dest1: env.DESTINATION_NUMBER,
+    dest2: req.body.to,
+    notify_url: getHangUpUrl( req )
 
-  , dest1: dest_number
-
-  , dest2: req.body.to
-
-  , caller_id: HOIIO_NUMBER
-
-  });
-
-  console.log(data)
+  })
 
   // Send out request
-  request
-    .post('https://secure.hoiio.com/open/voice/call')
-    .type('form')
-    .send(data)
-    .end(function(res) {
-      console.log('Make Call Reply >>>>>>>>>>>>>>>>>>>>>>');
-      var status = res.ok ? 'OK' : 'ERROR';
+  sendReq( 'https://secure.hoiio.com/open/voice/call', data )
 
-      console.log(status, res.body)
-      console.log('Make call Reply >>>>>>>>>>>>>>>>>>>>>>');
-    });
-
-  res.redirect('/call');
+  res.redirect( '/call' )
 
 }
 
-
-function getUrl(req) {
-
-  // URL to response to
-  var port = ':' + app.set('port');
-
-  if (port !== ':80') {
-    port = '';
-  }
-
-  return req.protocol +'://'+ req.host + port;
-
-}
 
 function hangup (req) {
 
-  var root = getUrl(req);
-
   // Setting up data to be send out to Hoiio
-  var data = _.extend(_.clone(settings), {
+  var data = _.extend( _.clone( opts ), {
 
-    session: req.body.session
+    session: req.body.session,
+    notify_url: getHangUpUrl( req )
 
-  , notify_url: root + '/on/hangup'
-  });
+  })
 
   // Send out request
-  request
-    .post(ivrUrl + '/end/hangup')
-    .type('form')
-    .send(data)
-    .end(function(res) {
-      console.log('Hangup Reply >>>>>>>>>>>>>>>>>>>>>>');
-      var status = res.ok ? 'OK' : 'ERROR';
-
-      console.log(status, res.body)
-      console.log('hangup reply >>>>>>>>>>>>>>>>>>>>>>');
-    });
+  sendReq( ivrUrl + '/end/hangup', data )
 
 }
 
+
 function transfer (req) {
 
-  var root = getUrl(req);
-
   // Setting up data to be send out to Hoiio
-  var data = _.extend(_.clone(settings), {
+  var data = _.extend( _.clone( opts ), {
 
+    caller_id: req.body.from,
+    dest: env.DESTINATION_NUMBER,
+    notify_url: getHangUpUrl( req ),
     session: req.body.session
 
-  , notify_url: root + '/on/hangup'
+  })
 
-  , dest: dest_number
+  // Send out request
+  sendReq( ivrUrl + '/end/transfer', data )
 
-  , caller_id: req.body.from
+}
 
-  });
 
-  console.log('Transfering >>>>>>>>>>>>>>>>>>>>>>');
-  console.log(data)
-  console.log('Transfering >>>>>>>>>>>>>>>>>>>>>>');
+/**
+ * Using current request to get it's host URL
+ **/
+
+function getUrl (req) {
+
+  // URL to response to
+  var port = ':' + app.set( 'port' )
+
+  if (port !== ':80') {
+    port = ''
+  }
+
+  return req.protocol +'://'+ req.host + port
+
+}
+
+function getHangUpUrl (req) {
+  return getUrl( req ) + '/on/hangup'
+}
+
+
+/**
+ * Generalized helper to send request
+ **/
+
+function sendReq (url, data) {
 
   // Send out request
   request
-    .post(ivrUrl + '/end/transfer')
-    .type('form')
-    .send(data)
-    .end(function(res) {
-      console.log('Transfer Reply >>>>>>>>>>>>>>>>>>>>>>');
-      var status = res.ok ? 'OK' : 'ERROR';
+    .post( url )
+    .type( 'form' )
+    .send( data )
+    .end( logResp )
 
-      console.log(status, res.body)
-      console.log('Transfer Reply >>>>>>>>>>>>>>>>>>>>>>');
-    });
+}
 
+
+/**
+ * Logging response from Hoiio
+ **/
+
+function logResp (res) {
+  var status = res.ok ? 'OK' : 'ERROR'
 }

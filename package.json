@@ -1,5 +1,6 @@
 {
-  "name": "hoiio-call-example",
+  "name": "call-redirect",
+  "subdomain": "call-redirect",
   "scripts": {
     "start": "app.js"
   },
@@ -8,7 +9,7 @@
     "node": "0.6.x - 0.8.x"
   },
   "dependencies": {
-    "express": "3.0.0beta4",
+    "express": ">= 3.0.0rc1",
     "jade": "*",
     "stylus": "*",
     "lodash": "0.3.x",
