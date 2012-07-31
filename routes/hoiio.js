@@ -19,6 +19,29 @@ opts.app_id = env.HOIIO_APP_ID
 opts.access_token = env.HOIIO_ACCESS_TOKEN
 
 
+exports.logs = function (req, res, nex) {
+
+  getLogs(function (resp) {
+
+    var data = {};
+
+    if ( resp.ok ) {
+
+      data = resp.body
+
+    }
+
+    res.render( 'logs', {
+
+      title: 'Logs',
+      logs: data
+
+    })
+
+  })
+
+}
+
 
 exports.call = function (req, res, next) {
 
@@ -88,6 +111,15 @@ function makecall (req, res) {
 }
 
 
+function getLogs (next) {
+
+  var url = 'https://secure.hoiio.com/open/voice/get_history'
+
+
+  sendReq( url, _.clone( opts ), next )
+}
+
+
 function hangup (req) {
 
   // Setting up data to be send out to Hoiio
@@ -148,22 +180,16 @@ function getHangUpUrl (req) {
  * Generalized helper to send request
  **/
 
-function sendReq (url, data) {
+function sendReq (url, data, next) {
 
   // Send out request
   request
     .post( url )
     .type( 'form' )
     .send( data )
-    .end( logResp )
+    .end( next || noop )
 
 }
 
+function noop () {}
 
-/**
- * Logging response from Hoiio
- **/
-
-function logResp (res) {
-  var status = res.ok ? 'OK' : 'ERROR'
-}

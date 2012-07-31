@@ -18,8 +18,6 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.cookieParser('whateveeeeer'));
-  app.use(express.session());
   app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));
   app.use(express.static(__dirname + '/public'));
@@ -35,6 +33,8 @@ app.get('/call', routes.hoiio.makecall);
 app.post('/on/call', routes.hoiio.call);
 app.post('/end/hangup', routes.hoiio.hangup);
 app.post('/call', routes.hoiio.handleMakeCall);
+
+app.get('/logs', routes.hoiio.logs);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

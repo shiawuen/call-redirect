@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h2 logs
+
+  ul.logs
+    each entry in logs.entries
+      li
+        = entry.dest1 + ' -&gt; ' + entry.dest2 + ' : ' + entry.duration + 'min'
+        br
+        = entry.date
