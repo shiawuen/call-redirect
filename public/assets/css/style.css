@@ -1,0 +1,25 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00b7ff;
+}
+.field,
+input[type="submit"] {
+  font-size: 17px;
+}
+.logs li {
+  margin-bottom: 0.5em;
+  word-spacing: 0.5em;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.bubble {
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+  background-color: #98bff2;
+  padding: 2px 7px;
+  color: #000;
+}

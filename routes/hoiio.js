@@ -19,24 +19,17 @@ opts.app_id = env.HOIIO_APP_ID
 opts.access_token = env.HOIIO_ACCESS_TOKEN
 
 
+exports.onhangup = function (req, res) {
+  res.send('OK')
+};
+
+
 exports.logs = function (req, res, nex) {
 
   getLogs(function (resp) {
+    var withResults = resp.ok && resp.body && resp.body.entries;
 
-    var data = {};
-
-    if ( resp.ok ) {
-
-      data = resp.body
-
-    }
-
-    res.render( 'logs', {
-
-      title: 'Logs',
-      logs: data
-
-    })
+    res.send( withResults ? resp.body.entries : [] )
 
   })
 
@@ -61,35 +54,16 @@ exports.hangup = function (req, res, next) {
 
 }
 
-
-exports.makecall = function (req, res, next) {
-
-  res.render( 'call', {
-    title: 'Make call'
-  })
-
-}
-
 exports.handleMakeCall = function (req, res, next) {
 
   // Cancel the actiona and redirect back to call page
   if ( ! req.body.to ) {
-    res.redirect( '/call' )
+    return res.send({ error: 'Need to specify a number to call' });
   }
 
   makecall( req, res )
 
 }
-
-
-exports.hangup = function (req, res, next) {
-
-  console.log( req.body )
-
-  res.send( 'OK' )
-
-}
-
 
 function makecall (req, res) {
 
@@ -106,7 +80,7 @@ function makecall (req, res) {
   // Send out request
   sendReq( 'https://secure.hoiio.com/open/voice/call', data )
 
-  res.redirect( '/call' )
+  res.send({ message: 'OK' })
 
 }
 

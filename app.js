@@ -27,14 +27,13 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/', routes.index);
-app.get('/call', routes.hoiio.makecall);
 
-app.post('/on/call', routes.hoiio.call);
-app.post('/end/hangup', routes.hoiio.hangup);
-app.post('/call', routes.hoiio.handleMakeCall);
+app.post('/api/on/call', routes.hoiio.call);
+app.all('/api/on/hangup', routes.hoiio.onhangup);
+app.post('/api/end/hangup', routes.hoiio.hangup);
+app.post('/api/call', routes.hoiio.handleMakeCall);
+app.get('/api/logs', routes.hoiio.logs);
 
-app.get('/logs', routes.hoiio.logs);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
