@@ -24,7 +24,7 @@ function(app) {
     defaults: function () {
       return {
         to: ''
-      }
+      };
     },
 
     placeholders: {
@@ -54,7 +54,7 @@ function(app) {
     },
 
     save: function (event) {
-      event && event.preventDefault();
+      if (event && 'preventDefault' in event) { event.preventDefault(); }
 
       this.model.save({
         to: this.$('#to').val()

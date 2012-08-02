@@ -18,7 +18,7 @@ function(app) {
         to: '',
         date: '',
         duration: ''
-      }
+      };
     }
 
   });
@@ -59,9 +59,9 @@ function(app) {
         this.insertView(new Views.ListItem({
           model: item
         }));
-      }, this)
+      }, this);
 
-      return manage( this ).render()
+      return manage( this ).render();
     }
   });
 
