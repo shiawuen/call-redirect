@@ -12,7 +12,7 @@
     "express": ">= 3.0.0rc1",
     "jade": "*",
     "stylus": "*",
-    "lodash": "0.3.x",
+    "lodash": "4.17.x",
     "superagent": "0.5.x"
   }
 }
